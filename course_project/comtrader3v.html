@@ -1,0 +1,261 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>comtrader3v</title><meta name="generator" content="MATLAB 9.2"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-02-28"><meta name="DC.source" content="comtrader3v.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Initial pams</a></li></ul></div><pre class="codeinput">clear;clc;
+</pre><h2 id="2">Initial pams</h2><pre class="codeinput">P=400000; <span class="comment">% set power</span>
+</pre><pre class="codeinput">n_sim = 3000; <span class="comment">% number of iteration</span>
+i=1;
+n_ev = 1500;
+regimes = [<span class="string">"OnePhaseSC"</span>;<span class="string">"TwoPhaseSC"</span>; <span class="string">"ThreePhaseSC"</span>];
+readme = fopen(<span class="string">'readme.txt'</span>,<span class="string">'w'</span>);
+fprintf(readme, [repmat(<span class="string">'%s\t'</span>,1, size(regimes,1)) <span class="string">'\n'</span>], regimes);
+fclose(readme);
+regime = <span class="string">""</span>;
+
+<span class="keyword">while</span> i &lt;n_sim
+    f = randn();
+
+      short_cit_start = rand(1)*(5/60-3/60)+1/60;
+      short_cit_end = short_cit_start + rand(1)*3/60;
+
+      f = <span class="string">"["</span>+short_cit_start+<span class="string">" "</span>+ short_cit_end + <span class="string">"]"</span> ;
+<span class="comment">%       % &#1091;&#1089;&#1090;&#1072;&#1085;&#1086;&#1074;&#1080;&#1084; &#1074;&#1088;&#1077;&#1084;&#1103; &#1087;&#1086;&#1103;&#1074;&#1083;&#1077;&#1085;&#1080;&#1103; &#1080; &#1087;&#1088;&#1086;&#1076;&#1086;&#1083;&#1078;&#1080;&#1090;&#1077;&#1083;&#1100;&#1085;&#1086;&#1089;&#1090;&#1100; &#1082;&#1079;</span>
+          set_param(<span class="string">'ComtradeRec_v2/fault1'</span>,<span class="string">'SwitchTimes'</span>,<span class="keyword">...</span>
+              f);
+
+<span class="comment">%       sim_time = abs(randn())*0.1;</span>
+      <span class="comment">% &#1074;&#1088;&#1077;&#1084;&#1103; &#1086;&#1082;&#1086;&#1085;&#1095;&#1072;&#1085;&#1080;&#1103; &#1089;&#1080;&#1084;&#1091;&#1083;&#1103;&#1094;&#1080;&#1080;</span>
+<span class="comment">%     set_param('ComtradeRec','StopTime',num2str(0.1));</span>
+
+    log= randi([0,1],1,3); <span class="comment">% &#1072;&#1073;&#1089;&#1086;&#1083;&#1102;&#1090;&#1085;&#1086; &#1089;&#1083;&#1091;&#1095;&#1072;&#1081;&#1085;&#1072;&#1103; &#1075;&#1077;&#1085;&#1077;&#1088;&#1072;&#1094;&#1080;&#1103;</span>
+    ground_key = 1;
+
+
+    <span class="keyword">if</span> sum(log)==1
+        <span class="keyword">if</span> ground_key
+            regime = regimes(1);
+        <span class="keyword">else</span>
+            <span class="keyword">continue</span>
+        <span class="keyword">end</span>
+    <span class="keyword">elseif</span> sum(log)== 2
+            regime = regimes(2);
+    <span class="keyword">elseif</span> sum(log)== 3
+            regime = regimes(3);
+    <span class="keyword">else</span>
+        <span class="keyword">continue</span>
+    <span class="keyword">end</span>
+
+
+    model = <span class="string">"fault1"</span>;
+
+<span class="comment">%     &#1091;&#1089;&#1090;&#1072;&#1085;&#1086;&#1074;&#1082;&#1072; &#1087;&#1072;&#1088;&#1072;&#1084;&#1077;&#1090;&#1088;&#1086;&#1074; &#1084;&#1086;&#1076;&#1077;&#1083;&#1080;</span>
+    set_param(<span class="string">"ComtradeRec_v2/"</span>+model,<span class="string">'FaultA'</span>,(log(1)));
+    set_param(<span class="string">"ComtradeRec_v2/"</span>+model,<span class="string">'FaultB'</span>,(log(2)));
+    set_param(<span class="string">"ComtradeRec_v2/"</span>+model,<span class="string">'FaultC'</span>,(log(3)));
+    set_param(<span class="string">"ComtradeRec_v2/"</span>+model,<span class="string">'GroundFault'</span>,ground_key);
+
+    set_param(<span class="string">'ComtradeRec_v2/Load A1'</span>,<span class="string">'Activepower'</span>,num2str(P+abs(randn()*10000)));
+    set_param(<span class="string">'ComtradeRec_v2/Load A2'</span>,<span class="string">'Activepower'</span>,num2str(P+abs(randn()*10000)))
+    set_param(<span class="string">'ComtradeRec_v2/Load A3'</span>,<span class="string">'Activepower'</span>,num2str(P+abs(randn()*10000)))
+    set_param(<span class="string">'ComtradeRec_v2'</span>,<span class="string">'MaxConsecutiveZCsMsg'</span>,<span class="string">'none'</span>);
+
+    <span class="comment">% calling a compilation of power system model</span>
+    func=sim(<span class="string">'ComtradeRec_v2.slx'</span>);
+
+
+<span class="comment">%          subplot(1,2,1)</span>
+<span class="comment">%     plot(U3ph_comtrade.time,I3ph_comtrade.signals.values,'.-'), legend('1','2','3','4','5','6','7')</span>
+<span class="comment">%     xlabel('x'), ylabel('Sin(x)'), title('Sin(x) Graph')</span>
+<span class="comment">%</span>
+<span class="comment">%     subplot(1,2,2)</span>
+<span class="comment">%     plot(U3ph_comtrade.time,U3ph_comtrade.signals.values,'.-'...</span>
+<span class="comment">%         ), legend('1','2','3','4','5','6','7')</span>
+
+
+<span class="comment">%     &#1079;&#1072;&#1087;&#1080;&#1089;&#1100; &#1086;&#1089;&#1094;&#1080;&#1083;&#1083;&#1086;&#1075;&#1088;&#1072;&#1084;&#1084; &#1074; .csv</span>
+    oscill_table = table(U3ph_comtrade.time(1:n_ev), I3ph_comtrade.signals.values(1:n_ev,1),<span class="keyword">...</span>
+        I3ph_comtrade.signals.values(1:n_ev,2),<span class="keyword">...</span>
+        I3ph_comtrade.signals.values(1:n_ev,3),<span class="keyword">...</span>
+        U3ph_comtrade.signals.values(1:n_ev,1),<span class="keyword">...</span>
+        U3ph_comtrade.signals.values(1:n_ev,2),<span class="keyword">...</span>
+        U3ph_comtrade.signals.values(1:n_ev,3), <span class="string">'VariableNames'</span>,<span class="keyword">...</span>
+        {<span class="string">'time'</span>,<span class="string">'Ia'</span>,<span class="string">'Ib'</span>,<span class="string">'Ic'</span>,<span class="string">'Ua'</span>,<span class="string">'Ub'</span>,<span class="string">'Uc'</span>});
+    writetable(oscill_table, regime+<span class="string">""</span>+i+<span class="string">".csv"</span>);
+
+
+    <span class="comment">% reset fault position</span>
+    set_param(<span class="string">"ComtradeRec_v2/"</span>+model,<span class="string">'FaultA'</span>,0);
+    set_param(<span class="string">"ComtradeRec_v2/"</span>+model,<span class="string">'FaultB'</span>,0);
+    set_param(<span class="string">"ComtradeRec_v2/"</span>+model,<span class="string">'FaultC'</span>,0);
+    set_param(<span class="string">"ComtradeRec_v2/"</span>+model,<span class="string">'GroundFault'</span>,0);
+    i=i+1;
+
+<span class="keyword">end</span>
+</pre><pre class="codeoutput error">Error using comtrader3v (line 23)
+Invalid Simulink object name: ComtradeRec_v2/fault1
+
+Caused by:
+    Error using comtrader3v (line 23)
+    No block diagram 'ComtradeRec_v2' is loaded</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%%
+clear;clc;
+%% Initial pams
+P=400000; % set power
+%%
+n_sim = 3000; % number of iteration
+i=1; 
+n_ev = 1500;
+regimes = ["OnePhaseSC";"TwoPhaseSC"; "ThreePhaseSC"];
+readme = fopen('readme.txt','w');
+fprintf(readme, [repmat('%s\t',1, size(regimes,1)) '\n'], regimes);
+fclose(readme);
+regime = "";
+
+while i <n_sim
+    f = randn();
+
+      short_cit_start = rand(1)*(5/60-3/60)+1/60;
+      short_cit_end = short_cit_start + rand(1)*3/60;
+      
+      f = "["+short_cit_start+" "+ short_cit_end + "]" ;
+%       % установим время появления и продолжительность кз
+          set_param('ComtradeRec_v2/fault1','SwitchTimes',...
+              f);
+          
+%       sim_time = abs(randn())*0.1;    
+      % время окончания симуляции
+%     set_param('ComtradeRec','StopTime',num2str(0.1));
+
+    log= randi([0,1],1,3); % абсолютно случайная генерация   
+    ground_key = 1;
+    
+    
+    if sum(log)==1
+        if ground_key
+            regime = regimes(1);
+        else 
+            continue
+        end
+    elseif sum(log)== 2 
+            regime = regimes(2);
+    elseif sum(log)== 3 
+            regime = regimes(3);
+    else
+        continue
+    end
+        
+  
+    model = "fault1";
+    
+%     установка параметров модели
+    set_param("ComtradeRec_v2/"+model,'FaultA',(log(1)));
+    set_param("ComtradeRec_v2/"+model,'FaultB',(log(2)));
+    set_param("ComtradeRec_v2/"+model,'FaultC',(log(3)));
+    set_param("ComtradeRec_v2/"+model,'GroundFault',ground_key);
+    
+    set_param('ComtradeRec_v2/Load A1','Activepower',num2str(P+abs(randn()*10000)));
+    set_param('ComtradeRec_v2/Load A2','Activepower',num2str(P+abs(randn()*10000)))
+    set_param('ComtradeRec_v2/Load A3','Activepower',num2str(P+abs(randn()*10000)))
+    set_param('ComtradeRec_v2','MaxConsecutiveZCsMsg','none');
+    
+    % calling a compilation of power system model
+    func=sim('ComtradeRec_v2.slx');
+  
+    
+%          subplot(1,2,1)
+%     plot(U3ph_comtrade.time,I3ph_comtrade.signals.values,'.-'), legend('1','2','3','4','5','6','7')
+%     xlabel('x'), ylabel('Sin(x)'), title('Sin(x) Graph')
+% 
+%     subplot(1,2,2)
+%     plot(U3ph_comtrade.time,U3ph_comtrade.signals.values,'.-'...
+%         ), legend('1','2','3','4','5','6','7')
+
+    
+%     запись осциллограмм в .csv
+    oscill_table = table(U3ph_comtrade.time(1:n_ev), I3ph_comtrade.signals.values(1:n_ev,1),...
+        I3ph_comtrade.signals.values(1:n_ev,2),...
+        I3ph_comtrade.signals.values(1:n_ev,3),...
+        U3ph_comtrade.signals.values(1:n_ev,1),...
+        U3ph_comtrade.signals.values(1:n_ev,2),...
+        U3ph_comtrade.signals.values(1:n_ev,3), 'VariableNames',...
+        {'time','Ia','Ib','Ic','Ua','Ub','Uc'});
+    writetable(oscill_table, regime+""+i+".csv");
+    
+    
+    % reset fault position
+    set_param("ComtradeRec_v2/"+model,'FaultA',0);
+    set_param("ComtradeRec_v2/"+model,'FaultB',0);
+    set_param("ComtradeRec_v2/"+model,'FaultC',0);
+    set_param("ComtradeRec_v2/"+model,'GroundFault',0);
+    i=i+1;
+
+end
+
+##### SOURCE END #####
+--></body></html>
